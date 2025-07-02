@@ -3,7 +3,7 @@
 ########################################################################################################################
 
 AUTHOR				:=  maximart
-NAME				:=	ex01
+NAME				:=	nameOfYourExec
 HEADER				=	$(INC_DIR)
 CC 					:=	c++
 CFLAGS 				:=	-Wall -Wextra -Werror
@@ -12,9 +12,8 @@ CFLAGS 				+=	-MMD -MP
 AR					:=	ar rcs
 RM					:=	rm -f
 
-SRC_F				=	main \
-						Fixed
-HDR_F				=	Fixed
+SRC_F				=	NameOfYourSourceFileWithoutExt
+HDR_F				=	NameOfYourHeaderFileWithoutExt
 SRC					=	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_F)))
 OBJ 				=	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_F)))
 HDR					=	$(addprefix $(INC_DIR), $(addsuffix .hpp, $(HDR_F)))
