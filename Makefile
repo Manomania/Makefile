@@ -158,7 +158,6 @@ define DISPLAY_HELP
 						$(call SEPARATOR)
 						@printf "$(GREEN)Basic commands:$(DEF_COLOR)\n"
 						@printf "%-33b%b" "make" "- Build in release mode\n"
-						@printf "%-33b%b" "make debug" "- Build in debug mode\n"
 						@printf "%-33b%b" "make clean" "- Remove object files\n"
 						@printf "%-33b%b" "make fclean" "- Remove all generated files\n"
 						@printf "%-33b%b" "make re" "- Clean and rebuild\n\n"
