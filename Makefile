@@ -69,6 +69,10 @@ info:
 ########################################################################################################################
 
 $(NAME):				$(OBJ)
+							@if [ ! -f "$(NAME)" ]; then \
+								printf "$(BLUE)[$(NAME)]:$(DEF_COLOR)\n"; \
+								printf "%-42b%b" "\r$(GREEN)Linking finished" "$(GREEN)[✓]$(DEF_COLOR)\n"; \
+							fi
 							@$(CC) $(CFLAGS) $(OBJ) -o $@
 
 $(OBJ_DIR)%.o: 			$(SRC_DIR)%.cpp $(INC_DIR)
@@ -139,18 +143,30 @@ ifeq ($(MAKECMDGOALS),re)
 						fi)
 endif
 
+ $(info MAKECMDGOALS = $(MAKECMDGOALS))
+ $(info SRCS_TO_COMPILE = $(SRCS_TO_COMPILE))
+ $(info NAME = $(NAME))
+ $(info Executable exists: $(shell if [ -f "$(NAME)" ]; then echo "YES"; else echo "NO"; fi))
+ $(info SRC_DIR = $(SRC_DIR))
+ $(info Find result: $(shell find $(SRC_DIR) -name '*.cpp' | wc -l))
+ $(info OBJ_DIR = $(OBJ_DIR))
+ $(info OBJ files: $(OBJ))
+ $(info Object files exist: $(shell for obj in $(OBJ); do if [ -f "$obj" ]; then echo "$obj: YES"; else echo "$obj: NO"; fi; done))
+
 define PROGRESS_BAR_PERCENTAGE
 						$(eval COMPILED_SRCS := $(shell expr $(COMPILED_SRCS) + 1))
-						@if [ $(COMPILED_SRCS) -eq 1 ]; then \
-							printf "$(BLUE)[$(NAME)]:$(DEF_COLOR)\n"; \
-						fi
-						@percentage=$$(if [ $(SRCS_TO_COMPILE) -eq 0 ]; then echo 0; else echo "scale=0; $(COMPILED_SRCS) * 100 / $(SRCS_TO_COMPILE)" | bc; fi); \
-						for frame in $(FRAMES); do \
-							printf "\r$(YELLOW)$$frame Compiling... [%d/%d] %d%%$(DEF_COLOR)" $(COMPILED_SRCS) $(SRCS_TO_COMPILE) $$percentage; \
-							sleep $(SLEEP_FRAME); \
-						done; \
-						if [ $(COMPILED_SRCS) -eq $(SRCS_TO_COMPILE) ]; then \
-							printf "%-42b%b" "\r$(GREEN)Compilation finished [$(COMPILED_SRCS)/$(SRCS_TO_COMPILE)]" "$(GREEN)[✓]$(DEF_COLOR)\n"; \
+						@if [ $(SRCS_TO_COMPILE) -gt 0 ]; then \
+							if [ $(COMPILED_SRCS) -eq 1 ]; then \
+								printf "$(BLUE)[$(NAME)]:$(DEF_COLOR)\n"; \
+							fi; \
+							percentage=$$(expr $(COMPILED_SRCS) \* 100 / $(SRCS_TO_COMPILE) 2>/dev/null || echo 0); \
+							for frame in $(FRAMES); do \
+								printf "\r$(YELLOW)%s Compiling... [%d/%d] %d%%$(DEF_COLOR)" "$$frame" $(COMPILED_SRCS) $(SRCS_TO_COMPILE) $$percentage; \
+								sleep $(SLEEP_FRAME); \
+							done; \
+							if [ $(COMPILED_SRCS) -eq $(SRCS_TO_COMPILE) ]; then \
+								printf "%-42b%b" "\r$(GREEN)Compilation finished [$(COMPILED_SRCS)/$(SRCS_TO_COMPILE)]" "$(GREEN)[✓]$(DEF_COLOR)\n"; \
+							fi; \
 						fi
 endef
 
