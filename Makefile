@@ -62,7 +62,7 @@ help:
 info:
 							$(call DISPLAY_INFO)
 
-.PHONY: 				all clean fclean re
+.PHONY: 				all clean fclean re help info
 
 ########################################################################################################################
 #                                                       COMMANDS                                                       #
@@ -104,14 +104,25 @@ SLEEP_FRAME			:=	0.001
 
 SRCS_TO_COMPILE		=	$(shell \
 						if [ -f "$(NAME)" ]; then \
-							find $(SRC_DIR) -name "*.cpp" -newer "$(NAME)" 2>/dev/null | wc -l; \
+							if [ "$(INC_DIR)" -nt "$(NAME)" ]; then \
+								find $(SRC_DIR) -name "*.cpp" 2>/dev/null | wc -l; \
+							else \
+								newer_headers=$$(find $(INC_DIR) -name "*.h" -o -name "*.hpp" -newer "$(NAME)" 2>/dev/null); \
+								if [ -n "$$newer_headers" ]; then \
+									count=0; \
+									for header in $$newer_headers; do \
+										header_name=$$(basename $$header); \
+										cpp_files=$$(find $(SRC_DIR) -name "*.cpp" -exec grep -l "#include.*$$header_name" {} \; 2>/dev/null | wc -l); \
+										count=$$((count + cpp_files)); \
+									done; \
+									echo $$count; \
+								else \
+									find $(SRC_DIR) -name "*.cpp" -newer "$(NAME)" 2>/dev/null | wc -l; \
+								fi; \
+							fi; \
 						else \
 							find $(SRC_DIR) -name "*.cpp" 2>/dev/null | wc -l; \
 						fi)
-
-ifeq ($(SRCS_TO_COMPILE),0)
-	SRCS_TO_COMPILE =	$(shell find $(SRC_DIR) -name "*.cpp" 2>/dev/null | wc -l)
-endif
 
 define PROGRESS_BAR_PERCENTAGE
 						$(eval COMPILED_SRCS := $(shell expr $(COMPILED_SRCS) + 1))
@@ -120,7 +131,7 @@ define PROGRESS_BAR_PERCENTAGE
 						fi
 						@percentage=$$(if [ $(SRCS_TO_COMPILE) -eq 0 ]; then echo 0; else echo "scale=0; $(COMPILED_SRCS) * 100 / $(SRCS_TO_COMPILE)" | bc; fi); \
 						for frame in $(FRAMES); do \
-							printf "\r$$frame Compiling... [%d/%d] %d%%" $(COMPILED_SRCS) $(SRCS_TO_COMPILE) $$percentage; \
+							printf "\r$(YELLOW)$$frame Compiling... [%d/%d] %d%%$(DEF_COLOR)" $(COMPILED_SRCS) $(SRCS_TO_COMPILE) $$percentage; \
 							sleep $(SLEEP_FRAME); \
 						done; \
 						if [ $(COMPILED_SRCS) -eq $(SRCS_TO_COMPILE) ]; then \
@@ -137,6 +148,7 @@ define	DISPLAY_TITLE
 						@echo "$(BLUE)			\\____/_/   /_/      "
 						@printf "$(PURPLE)			                    $(DEF_COLOR)"
 endef
+
 
 define	SEPARATOR
 						@printf "\n"
