@@ -143,16 +143,6 @@ ifeq ($(MAKECMDGOALS),re)
 						fi)
 endif
 
- $(info MAKECMDGOALS = $(MAKECMDGOALS))
- $(info SRCS_TO_COMPILE = $(SRCS_TO_COMPILE))
- $(info NAME = $(NAME))
- $(info Executable exists: $(shell if [ -f "$(NAME)" ]; then echo "YES"; else echo "NO"; fi))
- $(info SRC_DIR = $(SRC_DIR))
- $(info Find result: $(shell find $(SRC_DIR) -name '*.cpp' | wc -l))
- $(info OBJ_DIR = $(OBJ_DIR))
- $(info OBJ files: $(OBJ))
- $(info Object files exist: $(shell for obj in $(OBJ); do if [ -f "$obj" ]; then echo "$obj: YES"; else echo "$obj: NO"; fi; done))
-
 define PROGRESS_BAR_PERCENTAGE
 						$(eval COMPILED_SRCS := $(shell expr $(COMPILED_SRCS) + 1))
 						@if [ $(SRCS_TO_COMPILE) -gt 0 ]; then \
