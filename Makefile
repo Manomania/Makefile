@@ -102,38 +102,42 @@ COMPILED_SRCS		:=	0
 FRAMES				:=	⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏
 SLEEP_FRAME			:=	0.001
 
-SRCS_TO_COMPILE := $(shell \
-	if [ -f "$(NAME)" ]; then \
-		if [ "$(INC_DIR)" -nt "$(NAME)" ]; then \
-			find $(SRC_DIR) -name '*.cpp' | wc -l; \
-		else \
-			modified_headers=$$(find $(INC_DIR) -name '*.h' -o -name '*.hpp' -newer "$(NAME)"); \
-			all_affected_headers="$$modified_headers"; \
-			search_headers="$$modified_headers"; \
-			while [ -n "$$search_headers" ]; do \
-				new_found=""; \
-				for h in $$search_headers; do \
-					h_name=$$(basename $$h); \
-					includers=$$(grep -rl '#include *"'"$$h_name"'"' $(INC_DIR)); \
-					new_found="$$new_found $$includers"; \
-				done; \
-				search_headers=$$(echo $$new_found | tr ' ' '\n' | sort -u | grep -v -x -F "$$(echo $$all_affected_headers | tr ' ' '\n')" ); \
-				all_affected_headers="$$all_affected_headers $$search_headers"; \
-			done; \
-			all_affected_headers=$$(echo $$all_affected_headers | tr ' ' '\n' | sort -u); \
-			affected_cpp=""; \
-			for h in $$all_affected_headers; do \
-				h_name=$$(basename $$h); \
-				cpps=$$(grep -rl '#include *"'"$$h_name"'"' $(SRC_DIR)); \
-				affected_cpp="$$affected_cpp $$cpps"; \
-			done; \
-			modified_cpp=$$(find $(SRC_DIR) -name '*.cpp' -newer "$(NAME)"); \
-			all_cpp="$$modified_cpp $$affected_cpp"; \
-			echo "$$(echo $$all_cpp | tr ' ' '\n' | sort -u | wc -l)"; \
-		fi; \
-	else \
-		find $(SRC_DIR) -name '*.cpp' | wc -l; \
-	fi)
+ifeq ($(MAKECMDGOALS),re)
+					SRCS_TO_COMPILE := $(shell find $(SRC_DIR) -name '*.cpp' | wc -l)
+				else
+					SRCS_TO_COMPILE := $(shell \
+						if [ -f "$(NAME)" ]; then \
+							if [ "$(INC_DIR)" -nt "$(NAME)" ]; then \
+								find $(SRC_DIR) -name '*.cpp' | wc -l; \
+							else \
+								modified_headers=$$(find $(INC_DIR) -name '*.h' -o -name '*.hpp' -newer "$(NAME)"); \
+								all_affected_headers="$$modified_headers"; \
+								search_headers="$$modified_headers"; \
+								while [ -n "$$search_headers" ]; do \
+									new_found=""; \
+									for h in $$search_headers; do \
+										h_name=$$(basename $$h); \
+										includers=$$(grep -rl '#include *"'"$$h_name"'"' $(INC_DIR)); \
+										new_found="$$new_found $$includers"; \
+									done; \
+									search_headers=$$(echo $$new_found | tr ' ' '\n' | sort -u | grep -v -x -F "$$(echo $$all_affected_headers | tr ' ' '\n')" ); \
+									all_affected_headers="$$all_affected_headers $$search_headers"; \
+								done; \
+								all_affected_headers=$$(echo $$all_affected_headers | tr ' ' '\n' | sort -u); \
+								affected_cpp=""; \
+								for h in $$all_affected_headers; do \
+									h_name=$$(basename $$h); \
+									cpps=$$(grep -rl '#include *"'"$$h_name"'"' $(SRC_DIR)); \
+									affected_cpp="$$affected_cpp $$cpps"; \
+								done; \
+								modified_cpp=$$(find $(SRC_DIR) -name '*.cpp' -newer "$(NAME)"); \
+								all_cpp="$$modified_cpp $$affected_cpp"; \
+								echo "$$(echo $$all_cpp | tr ' ' '\n' | sort -u | wc -l)"; \
+							fi; \
+						else \
+							find $(SRC_DIR) -name '*.cpp' | wc -l; \
+						fi)
+endif
 
 define PROGRESS_BAR_PERCENTAGE
 						$(eval COMPILED_SRCS := $(shell expr $(COMPILED_SRCS) + 1))
