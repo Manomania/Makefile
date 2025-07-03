@@ -72,6 +72,9 @@ $(NAME):				$(OBJ)
 							@if [ ! -f "$(NAME)" ] && [ "$(MAKECMDGOALS)" != "re" ]; then \
 								printf "$(BLUE)[$(NAME)]:$(DEF_COLOR)\n"; \
 								printf "%-42b%b" "\r$(GREEN)Linking finished" "$(GREEN)[✓]$(DEF_COLOR)\n"; \
+								printf "\n"; \
+								echo "$(ORANGE)--------------------------------------------------------------------------$(DEF_COLOR)"; \
+								printf "\n"; \
 							fi
 							@$(CC) $(CFLAGS) $(OBJ) -o $@
 
