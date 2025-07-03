@@ -104,6 +104,7 @@ Facilement adaptable :
 
 - `bc` : Calculs de pourcentage
 - `find` : Recherche de fichiers
+- Modification manuelle du titre en ASCII ART (À automatiser dans une future update)
 - Terminal compatible Unicode pour les animations
 
 ---
